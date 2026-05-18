@@ -76,7 +76,7 @@ step "Sistem paketleri güncelleniyor..."
 info "sudo şifresi istenebilir"
 sudo apt-get update -qq
 
-REQUIRED_PKGS=(git curl build-essential python3-dev python3-venv python3-pip)
+REQUIRED_PKGS=(curl unzip build-essential python3-dev python3-venv python3-pip)
 TO_INSTALL=()
 
 for pkg in "${REQUIRED_PKGS[@]}"; do
@@ -174,25 +174,27 @@ ok "Node.js $(node --version) aktif | npm $(npm --version)"
 # ═══════════════════════════════════════════════════════════
 step "SAKA_OS kaynak kodu hazırlanıyor..."
 
-# Public repo — şifre/token istenmemesi için credential prompt tamamen kapatılıyor
-export GIT_TERMINAL_PROMPT=0
-GIT="git -c credential.helper="
+# git clone yerine ZIP indirme: public repo için auth hiç gerekmiyor,
+# credential manager / GUI popup sorunu tamamen ortadan kalkar.
+ARCHIVE_URL="https://github.com/kaanozcan4-star/SAKA_OS/archive/refs/heads/main.zip"
+TMP_ZIP="/tmp/saka_os_$$.zip"
 
 # Script SAKA_OS dizininin içinden mi çalışıyor?
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")" && pwd)"
 if [ -f "$SCRIPT_DIR/backend/requirements.txt" ] && [ -d "$SCRIPT_DIR/frontend" ]; then
     INSTALL_DIR="$SCRIPT_DIR"
     ok "Mevcut dizinde SAKA_OS tespit edildi: $INSTALL_DIR"
-elif [ -d "$INSTALL_DIR/.git" ]; then
-    info "Mevcut kurulum güncelleniyor: $INSTALL_DIR"
-    $GIT -C "$INSTALL_DIR" fetch origin main 2>&1 | tail -1
-    $GIT -C "$INSTALL_DIR" reset --hard origin/main 2>&1 | tail -1
-    ok "SAKA_OS güncellendi"
-elif [ -d "$INSTALL_DIR" ]; then
-    err "$INSTALL_DIR dizini mevcut ama git reposu değil.\n       Lütfen önce şunu çalıştırın: rm -rf $INSTALL_DIR"
 else
-    info "GitHub'dan klonlanıyor (~10 MB)..."
-    $GIT clone --depth 1 "$REPO_URL" "$INSTALL_DIR"
+    if [ -d "$INSTALL_DIR" ]; then
+        info "Mevcut kurulum siliniyor, güncelleniyor..."
+        rm -rf "$INSTALL_DIR"
+    fi
+    info "İndiriliyor: $ARCHIVE_URL"
+    curl -fsSL "$ARCHIVE_URL" -o "$TMP_ZIP"
+    info "Açılıyor..."
+    unzip -q "$TMP_ZIP" -d /tmp/
+    mv "/tmp/SAKA_OS-main" "$INSTALL_DIR"
+    rm -f "$TMP_ZIP"
     ok "SAKA_OS indirildi: $INSTALL_DIR"
 fi
 
