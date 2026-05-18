@@ -174,27 +174,60 @@ ok "Node.js $(node --version) aktif | npm $(npm --version)"
 # ═══════════════════════════════════════════════════════════
 step "SAKA_OS kaynak kodu hazırlanıyor..."
 
-# git clone yerine ZIP indirme: public repo için auth hiç gerekmiyor,
-# credential manager / GUI popup sorunu tamamen ortadan kalkar.
-ARCHIVE_URL="https://github.com/kaanozcan4-star/SAKA_OS/archive/refs/heads/main.zip"
 TMP_ZIP="/tmp/saka_os_$$.zip"
+TMP_EXTRACT="/tmp/saka_os_extract_$$"
 
-# Script SAKA_OS dizininin içinden mi çalışıyor?
+# Script zaten SAKA_OS dizininin içinden mi çalışıyor?
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")" && pwd)"
 if [ -f "$SCRIPT_DIR/backend/requirements.txt" ] && [ -d "$SCRIPT_DIR/frontend" ]; then
     INSTALL_DIR="$SCRIPT_DIR"
     ok "Mevcut dizinde SAKA_OS tespit edildi: $INSTALL_DIR"
 else
+    # SAKA_OS private repo — GitHub Personal Access Token gerekiyor
+    echo ""
+    echo -e "  ${BOLD}GitHub Personal Access Token gerekiyor${NC}"
+    echo -e "  ${DIM}(SAKA_OS private repodur, indirmek için token şart)${NC}"
+    echo ""
+    echo -e "  Token oluşturmak için:"
+    echo -e "    ${CYAN}github.com → Settings → Developer settings${NC}"
+    echo -e "    ${CYAN}→ Personal access tokens → Tokens (classic)${NC}"
+    echo -e "    Scope: ${BOLD}repo${NC} (sadece okuma yeterli)"
+    echo ""
+    read -p "  Token yapıştır ve Enter'a bas: " -r GITHUB_TOKEN < /dev/tty
+    echo ""
+
+    if [ -z "$GITHUB_TOKEN" ]; then
+        err "Token boş bırakılamaz."
+    fi
+
     if [ -d "$INSTALL_DIR" ]; then
         info "Mevcut kurulum siliniyor, güncelleniyor..."
         rm -rf "$INSTALL_DIR"
     fi
-    info "İndiriliyor: $ARCHIVE_URL"
-    curl -fsSL "$ARCHIVE_URL" -o "$TMP_ZIP"
+
+    info "İndiriliyor (GitHub API)..."
+    HTTP_CODE=$(curl -fsSL \
+        -H "Authorization: token $GITHUB_TOKEN" \
+        -H "Accept: application/vnd.github+json" \
+        -L "https://api.github.com/repos/kaanozcan4-star/SAKA_OS/zipball/main" \
+        -o "$TMP_ZIP" \
+        -w "%{http_code}" 2>/dev/null)
+
+    # Token'ı bellekten hemen sil — diske yazılmaz
+    unset GITHUB_TOKEN
+
+    if [ ! -s "$TMP_ZIP" ]; then
+        rm -f "$TMP_ZIP"
+        err "İndirme başarısız (HTTP $HTTP_CODE). Token geçerli mi ve repo erişimin var mı?"
+    fi
+
     info "Açılıyor..."
-    unzip -q "$TMP_ZIP" -d /tmp/
-    mv "/tmp/SAKA_OS-main" "$INSTALL_DIR"
-    rm -f "$TMP_ZIP"
+    mkdir -p "$TMP_EXTRACT"
+    unzip -q "$TMP_ZIP" -d "$TMP_EXTRACT"
+    # zipball'da klasör adı "kaanozcan4-star-SAKA_OS-{sha}" formatında gelir
+    EXTRACTED=$(ls "$TMP_EXTRACT/" | head -1)
+    mv "$TMP_EXTRACT/$EXTRACTED" "$INSTALL_DIR"
+    rm -rf "$TMP_ZIP" "$TMP_EXTRACT"
     ok "SAKA_OS indirildi: $INSTALL_DIR"
 fi
 
