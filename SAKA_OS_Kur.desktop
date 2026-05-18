@@ -1,0 +1,9 @@
+[Desktop Entry]
+Version=1.0
+Name=SAKA OS — Kur
+Comment=SAKA OS kurulumunu başlatır
+Exec=bash -c 'curl -fsSL https://raw.githubusercontent.com/kaanozcan4-star/SAKA_OS_Setup/main/setup.sh | bash; echo ""; echo "Kurulum bitti. Bu pencereyi kapatabilirsiniz."; exec bash'
+Terminal=true
+Type=Application
+Icon=utilities-terminal
+Categories=Science;Engineering;
