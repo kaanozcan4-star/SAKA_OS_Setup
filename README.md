@@ -5,11 +5,17 @@ Ubuntu 22.04+ / Debian 12+ desteklenir
 
 ---
 
-## ⬇️ Kurulum Dosyasını İndir
+## ⬇️ 1. Adım — setup.sh Dosyasını İndir
 
-**[→ setup.sh İNDİR ←](https://raw.githubusercontent.com/kaanozcan4-star/SAKA_OS_Setup/main/setup.sh)**
+Tarayıcıdan aşağıdaki linke tıkla, dosya otomatik inecek:
 
-İndirdikten sonra terminalde şunu çalıştır:
+**[→ setup.sh İNDİR (sağ tık → Farklı Kaydet)](https://github.com/kaanozcan4-star/SAKA_OS_Setup/raw/main/setup.sh)**
+
+---
+
+## ▶️ 2. Adım — Çalıştır
+
+İndirilen dosyayı çalıştır:
 
 ```bash
 bash ~/Downloads/setup.sh
@@ -17,17 +23,19 @@ bash ~/Downloads/setup.sh
 
 ---
 
-## Yöntem 2 — Terminal Komutu (tek satır)
+## Terminal ile Tek Satırda (alternatif)
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/kaanozcan4-star/SAKA_OS_Setup/main/setup.sh | bash
+# wget ile:
+wget -qO- https://github.com/kaanozcan4-star/SAKA_OS_Setup/raw/main/setup.sh | bash
+
+# curl ile:
+curl -fsSL https://github.com/kaanozcan4-star/SAKA_OS_Setup/raw/main/setup.sh | bash
 ```
 
 ---
 
 ## Kurulum Sonrası
-
-Uygulama başlatmak için:
 
 ```bash
 ~/SAKA_OS/run.sh
