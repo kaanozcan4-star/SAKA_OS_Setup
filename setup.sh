@@ -174,6 +174,10 @@ ok "Node.js $(node --version) aktif | npm $(npm --version)"
 # ═══════════════════════════════════════════════════════════
 step "SAKA_OS kaynak kodu hazırlanıyor..."
 
+# Public repo — şifre/token istenmemesi için credential prompt tamamen kapatılıyor
+export GIT_TERMINAL_PROMPT=0
+GIT="git -c credential.helper="
+
 # Script SAKA_OS dizininin içinden mi çalışıyor?
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")" && pwd)"
 if [ -f "$SCRIPT_DIR/backend/requirements.txt" ] && [ -d "$SCRIPT_DIR/frontend" ]; then
@@ -181,17 +185,14 @@ if [ -f "$SCRIPT_DIR/backend/requirements.txt" ] && [ -d "$SCRIPT_DIR/frontend" 
     ok "Mevcut dizinde SAKA_OS tespit edildi: $INSTALL_DIR"
 elif [ -d "$INSTALL_DIR/.git" ]; then
     info "Mevcut kurulum güncelleniyor: $INSTALL_DIR"
-    # BUG FIX: conflict varsa pull başarısız olur; --ff-only ile sadece hızlı ileri al
-    git -C "$INSTALL_DIR" fetch origin main 2>&1 | tail -1
-    git -C "$INSTALL_DIR" reset --hard origin/main 2>&1 | tail -1
+    $GIT -C "$INSTALL_DIR" fetch origin main 2>&1 | tail -1
+    $GIT -C "$INSTALL_DIR" reset --hard origin/main 2>&1 | tail -1
     ok "SAKA_OS güncellendi"
 elif [ -d "$INSTALL_DIR" ]; then
-    # BUG FIX: dizin var ama git repo değilse clone crash eder
     err "$INSTALL_DIR dizini mevcut ama git reposu değil.\n       Lütfen önce şunu çalıştırın: rm -rf $INSTALL_DIR"
 else
     info "GitHub'dan klonlanıyor (~10 MB)..."
-    # --depth 1: tüm git geçmişi yerine sadece son commit (daha hızlı)
-    git clone --depth 1 "$REPO_URL" "$INSTALL_DIR"
+    $GIT clone --depth 1 "$REPO_URL" "$INSTALL_DIR"
     ok "SAKA_OS indirildi: $INSTALL_DIR"
 fi
 
