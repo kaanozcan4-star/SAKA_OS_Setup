@@ -5,16 +5,19 @@ Ubuntu 22.04+ / Debian 12+ desteklenir
 
 ---
 
-## Yöntem 1 — Tek Tıkla Kur (Tavsiye)
+## ⬇️ Kurulum Dosyasını İndir
 
-1. **[⬇️ SAKA_OS_Kur.desktop indir](https://raw.githubusercontent.com/kaanozcan4-star/SAKA_OS_Setup/main/SAKA_OS_Kur.desktop)**
-2. İndirilen dosyaya **sağ tık → "Çalıştırılabilir olarak işaretle"**  
-   *(veya: sağ tık → Özellikler → İzinler → "Program olarak çalıştırmaya izin ver")*
-3. Dosyaya **çift tıkla** → terminal açılır, kurulum otomatik başlar
+**[→ setup.sh İNDİR ←](https://raw.githubusercontent.com/kaanozcan4-star/SAKA_OS_Setup/main/setup.sh)**
+
+İndirdikten sonra terminalde şunu çalıştır:
+
+```bash
+bash ~/Downloads/setup.sh
+```
 
 ---
 
-## Yöntem 2 — Terminal Komutu
+## Yöntem 2 — Terminal Komutu (tek satır)
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/kaanozcan4-star/SAKA_OS_Setup/main/setup.sh | bash
@@ -24,7 +27,7 @@ curl -fsSL https://raw.githubusercontent.com/kaanozcan4-star/SAKA_OS_Setup/main/
 
 ## Kurulum Sonrası
 
-Kurulum tamamlandıktan sonra uygulamayı başlatmak için:
+Uygulama başlatmak için:
 
 ```bash
 ~/SAKA_OS/run.sh
@@ -42,5 +45,3 @@ veya masaüstündeki / uygulama menüsündeki **SAKA OS** ikonuna tıkla.
 | RAM | 8 GB |
 | Disk | 3 GB boş alan |
 | İnternet | ~400 MB indirme |
-
-> GPU önerilir (NVIDIA). GPU olmadan da çalışır ama harita performansı düşük olabilir.
